@@ -1,6 +1,27 @@
 #!/usr/bin/python
-import re
 import argparse
+import re
+
+''' A utility to search for a word in a text file. If found, returns the
+complete paragraph the word was found in.
+
+Userful in conjunction with gpg to use as a command line password manager
+using a simple text file.
+'''
+
+def printparagraph(startpositions):
+    '''
+    Print starting with startposition (a line number) and continue
+    until a blank line is encountered. If EOF is encountered, break.
+    '''
+    for start in startpositions:
+        while lines[start] not in ['\n', '\r\n']:
+            print lines[start].strip()
+            start = start + 1
+            if lines[start] == lines[-1]:
+                break
+        print '\n'
+
 
 parser = argparse.ArgumentParser(description="search for a word and display the surrounding paragraph")
 parser.add_argument("pattern", help="the word you wish to match")
@@ -12,40 +33,31 @@ args = parser.parse_args()
 ''' Read each line of the file into a list '''
 lines = args.infile.readlines()
 
+
 ''' Compile a regular expression search pattern, case insensitive '''
 p = re.compile(args.pattern, re.I | re.M)
 
-''' Initial a counter and list to hold results '''
-linecount = 0
-foundit = []
 
 ''' Search each line of the file and return a list of line numbers 
     that match the pattern. There could be multiple returns. '''
+linecount = 0
+founditems = []
 for line in lines:
     line = line.strip()
     if p.search(line):
-        foundit.append(linecount)
+        founditems.append(linecount)
     linecount = linecount + 1
 
-''' Print results padded with before and after lines until newlines are found '''
-for x in foundit:
-    # Determine start position by taking line number (x), subtract 1 and test
-    # for a blank line.
-    k = x
-    while lines[k] not in ['\n', '\r\n']:
-        startposition = k
-        k = k - 1
 
-    # Print starting with line number startposition, advance line number by 1
-    # and test for blank line. If not blank, print. If blank, stop. If EOF,
-    # stop.
-    print '\n'
-    k = startposition
-    while lines[k] not in ['\n', '\r\n']:
-        print lines[k].strip()
-        k = k + 1
-        if lines[k] == lines[-1]:
-            break
+''' Determine start position by taking line number (item), subtract 1 and test
+    for a blank line. '''
+startpositions = []
+for item in founditems:
+    while lines[item] not in ['\n', '\r\n']:
+        item = item - 1
+    startpositions.append(item + 1)
+
+printparagraph(startpositions)
 
 args.infile.close()
 
