@@ -10,7 +10,7 @@ using a simple text file.
 '''
 
 
-def search(pattern):
+def filesearch(pattern):
     '''
     Search each line of the file and return a list of line numbers 
     that match the pattern. There could be multiple returns.
@@ -72,7 +72,7 @@ lines = args.infile.readlines()
 ''' Compile a regular expression search pattern, case insensitive '''
 p = re.compile(args.pattern, re.I | re.M)
 
-founditems = search(p)
+founditems = filesearch(p)
 
 startpositions = findstartpositions(founditems)
 
