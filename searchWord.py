@@ -9,6 +9,42 @@ Useful in conjunction with gpg to use as a command line password manager
 using a simple text file.
 '''
 
+
+def search(pattern):
+    '''
+    Search each line of the file and return a list of line numbers 
+    that match the pattern. There could be multiple returns.
+    '''
+    linecount = 0
+    founditems = []
+    for line in lines:
+        line = line.strip()
+        if p.search(line):
+            founditems.append(linecount)
+        linecount = linecount + 1
+    return founditems
+
+def findstartpositions(founditems):
+    '''
+    Determine start positions by taking line number (item), subtract 1 and test
+    for a blank line.
+    '''
+    startpositions = []
+    for item in founditems:
+        while lines[item] not in ['\n', '\r\n']:
+            item = item - 1
+        startpositions.append(item + 1)
+    return startpositions
+
+def makeunique(seq):
+    '''
+    Sometimes the search word is repeated within the paragraph, so make the
+    paragraphs that we print unique.
+    '''
+    set = {}
+    map(set.__setitem__, seq, [])
+    return set.keys()
+
 def printparagraph(startpositions):
     '''
     Print starting with startposition (a line number) and continue
@@ -21,6 +57,7 @@ def printparagraph(startpositions):
             if lines[start] == lines[-1]:
                 break
         print '\n'
+    return
 
 parser = argparse.ArgumentParser(description="search for a word and display the surrounding paragraph")
 parser.add_argument("pattern", help="the word you wish to match")
@@ -35,25 +72,11 @@ lines = args.infile.readlines()
 ''' Compile a regular expression search pattern, case insensitive '''
 p = re.compile(args.pattern, re.I | re.M)
 
-''' Search each line of the file and return a list of line numbers 
-    that match the pattern. There could be multiple returns. '''
-linecount = 0
-founditems = []
-for line in lines:
-    line = line.strip()
-    if p.search(line):
-        founditems.append(linecount)
-    linecount = linecount + 1
+founditems = search(p)
 
-''' Determine start position by taking line number (item), subtract 1 and test
-    for a blank line. '''
-startpositions = []
-for item in founditems:
-    while lines[item] not in ['\n', '\r\n']:
-        item = item - 1
-    startpositions.append(item + 1)
+startpositions = findstartpositions(founditems)
 
-printparagraph(startpositions)
+printparagraph(makeunique(startpositions))
 
 args.infile.close()
 
