@@ -41,9 +41,7 @@ def makeunique(seq):
     Sometimes the search word is repeated within the paragraph, so make the
     paragraphs that we print unique.
     '''
-    set = {}
-    map(set.__setitem__, seq, [])
-    return set.keys()
+    return set(seq)
 
 def printparagraph(startpositions):
     '''
@@ -52,11 +50,11 @@ def printparagraph(startpositions):
     '''
     for start in startpositions:
         while lines[start] not in ['\n', '\r\n']:
-            print lines[start].strip()
+            print(lines[start].strip())
             start = start + 1
             if lines[start] == lines[-1]:
                 break
-        print '\n'
+        print('\n')
     return
 
 parser = argparse.ArgumentParser(description="search for a word and display the surrounding paragraph")
